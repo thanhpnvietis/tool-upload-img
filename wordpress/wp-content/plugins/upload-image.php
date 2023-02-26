@@ -59,8 +59,20 @@ add_action('rest_api_init', function () {
 function uploadFileToPost($request)
 {
   $postId = $request->get_param('post_id');
+  $removeAttatchId = explode(',',$request->get_param('delete_attachment_id') ?? '') ;
   $listImage = mypluginMediaUpload($request);
-  return array('data'=>pushImageToContent($postId, $listImage));
+  pushImageToContent($postId, $listImage);
+  deleteAttachment($removeAttatchId);
+  $listImage = array_map(function($id){
+    return get_post($id);
+  },$listImage);
+  return array('data'=>$listImage);
+}
+
+function deleteAttachment($idAttachment){
+  foreach ($idAttachment as $key => $value) {
+    wp_delete_attachment($value,true);
+  }
 }
 
 function pushImageToContent($postId, $listImage)
@@ -81,6 +93,11 @@ function pushImageToContent($postId, $listImage)
   }
 
   $index = 0;
+  $content = preg_replace(
+    '/(<!-- wp:heading -->[\s\S]*?<!-- \/wp:heading -->[\n ]*?)(:?<!-- wp:gallery {"linkTo":"none"} -->[\s\S]*?<!-- \/wp:gallery -->[\n ]*?)/',
+    '$1',
+    $content
+  );
   $content = preg_replace_callback('/<!-- wp:heading -->[\s\S]*?<!-- \/wp:heading -->/',function($matchs) use ($gallerys , &$index){
     $gallery = $gallerys[$index];
     $index++;
@@ -91,9 +108,9 @@ function pushImageToContent($postId, $listImage)
     'post_content' => $content,
     'post_status'   => 'publish',
   );
-
+  remove_action( 'post_updated', 'wp_save_post_revision' );
   $updated_post = wp_update_post( $post_data );
-
+  add_action( 'post_updated', 'wp_save_post_revision' );
   if ( is_wp_error( $updated_post ) ) {
       return new WP_Error( 'post_update_error', $updated_post->get_error_message(), array( 'status' => 500 ) );
   }
@@ -122,7 +139,8 @@ function getWpGallery($images)
 }
 function mypluginMediaUpload($request)
 {
-  $time = 'test';
+  $postId = $request->get_param('post_id');
+  $time = $postId;
   $attachment_ids = array();
   $files = $_FILES['files'];
 
@@ -140,7 +158,9 @@ function mypluginMediaUpload($request)
       if (isset($uploaded_file['error'])) {
         return new WP_Error('upload_error', $uploaded_file['error']);
       }
-
+      if($uploaded_file['url']){
+        $uploaded_file['url'] = preg_replace('/(?<!https:|http:)\/\//','/',$uploaded_file['url']);
+      }
       $attachment = array(
         'post_mime_type' => $uploaded_file['type'],
         'post_title' => preg_replace('/\.[^.]+$/', '', basename($uploaded_file['file'])),
