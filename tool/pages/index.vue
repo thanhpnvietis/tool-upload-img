@@ -99,7 +99,7 @@ export default {
       this.detail = data.data;
     },
     async getUploadComplete(listId){
-      let {result} = await $fetch('http://localhost:3000/api/post/get',{
+      let {result} = await $fetch(process.env.base_url+'/api/post/get',{
         method: 'POST',
         body: JSON.stringify({
           col: 'posts', 
@@ -138,7 +138,7 @@ export default {
       for( let i = 0; i < event.target.files.length; i ++ ){
           formData.append('files['+i+']', event.target.files[i] );
       }
-      $fetch( 'http://tooluploadfile.local/wp-json/api_upload_file/v1/upload-file-to-post/', {
+      $fetch( process.env.base_url_wp+'/wp-json/api_upload_file/v1/upload-file-to-post/', {
         method: 'POST',
         body: formData
       }).then(async e =>{
@@ -181,7 +181,7 @@ export default {
         status:param.status,
         image_url:param.image_url,
       }
-      let {result} = await $fetch( 'http://localhost:3000/api/post/add?col=posts', {
+      let {result} = await $fetch( process.env.BASE_URL+'/api/post/add?col=posts', {
         method: 'POST',
         body
       })
