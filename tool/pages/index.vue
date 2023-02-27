@@ -52,6 +52,8 @@ export default {
 
   data() {
     return {
+      base_url_wp: this.$config.public.base_url_wp,
+      base_url: this.$config.public.base_url,
       uploading: false,
       posts : [],
       notData: false,
@@ -99,7 +101,7 @@ export default {
       this.detail = data.data;
     },
     async getUploadComplete(listId){
-      let {result} = await $fetch(process.env.base_url+'/api/post/get',{
+      let {result} = await $fetch(this.base_url+'/api/post/get',{
         method: 'POST',
         body: JSON.stringify({
           col: 'posts', 
@@ -138,7 +140,7 @@ export default {
       for( let i = 0; i < event.target.files.length; i ++ ){
           formData.append('files['+i+']', event.target.files[i] );
       }
-      $fetch( process.env.base_url_wp+'/wp-json/api_upload_file/v1/upload-file-to-post/', {
+      $fetch( this.base_url_wp+'/wp-json/api_upload_file/v1/upload-file-to-post/', {
         method: 'POST',
         body: formData
       }).then(async e =>{
@@ -161,6 +163,7 @@ export default {
         }
 
       }).catch( async e => {
+        console.log(e);
         let postComplete =  await this.addPostComplete({
           post_id:this.detail.id,
           status: this.status_process.error,
@@ -181,7 +184,7 @@ export default {
         status:param.status,
         image_url:param.image_url,
       }
-      let {result} = await $fetch( process.env.BASE_URL+'/api/post/add?col=posts', {
+      let {result} = await $fetch( this.base_url+'/api/post/add?col=posts', {
         method: 'POST',
         body
       })
@@ -190,7 +193,7 @@ export default {
     },
     loadData(){
       this.loading = true;
-      $fetch('http://tooluploadfile.local/wp-json/wp/v2/posts?page='+this.page).then(async  (data) =>{
+      $fetch(this.base_url_wp+'/wp-json/wp/v2/posts?page='+this.page).then(async  (data) =>{
         let listId = data.map(e=>e.id);
         let listInTool = await this.getUploadComplete(listId);
         for(let i = 0; i < data.length;i++){
@@ -213,10 +216,12 @@ export default {
             data[i]['status_process'] = this.status_process.none ;
           }
         }
+
         this.loading = false;
         this.posts = [...this.posts ,...data];
         this.page++;
       }).catch(e=>{
+        console.log(e);
         this.notData = true;
       })
     }
