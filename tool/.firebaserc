@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "nuxtapp": "cobalt-carver-230002"
+  },
+  "targets": {
+    "cobalt-carver-230002": {
+      "hosting": {
+        "nuxtapp": [
+          "cobalt-carver-230002"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

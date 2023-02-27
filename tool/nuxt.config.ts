@@ -17,12 +17,9 @@ export default defineNuxtConfig({
     public: {
       base_url: process.env.BASE_URL ,
       base_url_wp: process.env.BASE_URL_WP
-      // base_url: process.env.BASE_URL || 'http://localhost:3000',
-      // base_url_wp: process.env.BASE_URL_WP || 'http://tooluploadfile.local'
     }
+  },
+  nitro:{
+    preset: 'firebase'
   }
-  // buildModules: [
-  //   '@nuxtjs/dotenv'
-  // ]
-
 })
