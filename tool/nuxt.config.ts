@@ -1,9 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // env: {
-  //   base_url: process.env.BASE_URL || 'http://localhost:3000',
-  //   base_url_wp: process.env.BASE_URL_WP || 'http://tooluploadfile.local'
-  // },
+
   css: [
     'primevue/resources/themes/saga-blue/theme.css',
     'primevue/resources/primevue.css',
@@ -19,7 +16,7 @@ export default defineNuxtConfig({
       base_url_wp: process.env.BASE_URL_WP
     }
   },
-  nitro:{
-    preset: 'firebase'
-  }
+  // nitro:{
+  //   preset: 'firebase'
+  // }
 })
