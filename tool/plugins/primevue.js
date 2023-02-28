@@ -3,7 +3,7 @@ import PrimeVue from "primevue/config";
 import Button from "primevue/button";
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Dialog from 'primevue/Dialog';
+import Dialog from 'primevue/dialog';
 import ColumnGroup from 'primevue/columngroup';     //optional for column grouping
 import Row from 'primevue/row';                     //optional for row
 import FileUpload from 'primevue/fileupload';

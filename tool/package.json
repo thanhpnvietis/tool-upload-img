@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
+    "start": "nuxt start",
     "build-fb": "firebase target:apply hosting nuxtapp cobalt-carver-230002 && cd .output/server && npm i && cd ../../ && firebase deploy",
     "dev": "nuxt dev --port=3000",
     "generate": "nuxt generate",
@@ -15,6 +16,7 @@
   "dependencies": {
     "bootstrap": "^5.2.3",
     "firebase": "^9.17.1",
+    "firebase-functions": "^4.2.1",
     "primeicons": "^6.0.1",
     "primevue": "^3.23.0"
   }
