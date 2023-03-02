@@ -62,6 +62,7 @@ function uploadFileToPost($request)
   $removeAttatchId = explode(',',$request->get_param('delete_attachment_id') ?? '') ;
   $listImage = mypluginMediaUpload($request);
   pushImageToContent($postId, $listImage);
+  set_post_thumbnail( $postId, $listImage[0]);
   deleteAttachment($removeAttatchId);
   $listImage = array_map(function($id){
     return get_post($id);
@@ -80,7 +81,7 @@ function pushImageToContent($postId, $listImage)
 
   $post = get_post($postId);
   $content = $post->post_content;
-  preg_match_all('/<!-- wp:heading -->[\s\S]*?<!-- \/wp:heading -->/', $content, $matchHeading);
+  preg_match_all('/<!-- wp:heading.*?-->[\s\S]*?<!-- \/wp:heading -->/', $content, $matchHeading);
   $countHeading = count($matchHeading[0]);
   $offset = 0;
   $limit = ceil(count($listImage)/$countHeading);
@@ -94,11 +95,11 @@ function pushImageToContent($postId, $listImage)
 
   $index = 0;
   $content = preg_replace(
-    '/(<!-- wp:heading -->[\s\S]*?<!-- \/wp:heading -->[\n ]*?)(:?<!-- wp:gallery {"linkTo":"none"} -->[\s\S]*?<!-- \/wp:gallery -->[\n ]*?)/',
+    '/(<!-- wp:heading.*?-->[\s\S]*?<!-- \/wp:heading -->[\n ]*?)(:?<!-- wp:gallery {"linkTo":"none"} -->[\s\S]*?<!-- \/wp:gallery -->[\n ]*?)/',
     '$1',
     $content
   );
-  $content = preg_replace_callback('/<!-- wp:heading -->[\s\S]*?<!-- \/wp:heading -->/',function($matchs) use ($gallerys , &$index){
+  $content = preg_replace_callback('/<!-- wp:heading.*?-->[\s\S]*?<!-- \/wp:heading -->/',function($matchs) use ($gallerys , &$index){
     $gallery = $gallerys[$index];
     $index++;
     return $matchs[0].$gallery;
@@ -155,6 +156,7 @@ function mypluginMediaUpload($request)
       );
 
       $uploaded_file = wp_handle_upload($file, array('test_form' => false), $time);
+      // var_dump($uploaded_file);
       if (isset($uploaded_file['error'])) {
         return new WP_Error('upload_error', $uploaded_file['error']);
       }
