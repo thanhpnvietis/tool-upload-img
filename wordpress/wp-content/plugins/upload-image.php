@@ -30,7 +30,7 @@ add_action('rest_api_init', function () {
           'required' => true,
         ),
         'files' => array(
-          'required' => true,
+          // 'required' => true,
           'type' => 'array',
           'description' => 'Files to upload.',
           'items' => array(
@@ -59,11 +59,16 @@ add_action('rest_api_init', function () {
 function uploadFileToPost($request)
 {
   $postId = $request->get_param('post_id');
-  $removeAttatchId = explode(',',$request->get_param('delete_attachment_id') ?? '') ;
-  $listImage = mypluginMediaUpload($request);
-  pushImageToContent($postId, $listImage);
+  $imageId = $request->get_param('list_image');
+  // $removeAttatchId = explode(',',$request->get_param('delete_attachment_id') ?? '') ;
+  if($imageId){
+    $listImage = $imageId;
+  }else{
+    $listImage = mypluginMediaUpload($request);
+  }
+  pushImageToContent($postId, $listImage,$request);
   set_post_thumbnail( $postId, $listImage[0]);
-  deleteAttachment($removeAttatchId);
+  // deleteAttachment($removeAttatchId);
   $listImage = array_map(function($id){
     return get_post($id);
   },$listImage);
@@ -76,9 +81,8 @@ function deleteAttachment($idAttachment){
   }
 }
 
-function pushImageToContent($postId, $listImage)
+function pushImageToContent($postId, $listImage, $request)
 {
-
   $post = get_post($postId);
   $content = $post->post_content;
   preg_match_all('/<!-- wp:heading.*?-->[\s\S]*?<!-- \/wp:heading -->/', $content, $matchHeading);
@@ -89,7 +93,7 @@ function pushImageToContent($postId, $listImage)
 
   while ($offset < count($listImage)) {
     $groupImg = array_slice($listImage,$offset,$limit);
-    $gallerys[] = getWpGallery($groupImg);
+    $gallerys[] = getWpGallery($groupImg,$request);
     $offset += $limit;
   }
 
@@ -118,9 +122,31 @@ function pushImageToContent($postId, $listImage)
   return $listImage;
 }
 
-function getWpGallery($images)
+function getWpGallery($images,$request)
 {
-  
+  $linkTo = $request->get_param('link_to');
+  $size = $request->get_param('size');
+  $columns = $request->get_param('columns');
+  $ids = implode(',',$images);
+  $attribute = [];
+
+  if($linkTo){
+    $attribute['link'] = $linkTo;
+  }
+
+  if($size){
+    $attribute['size'] = $size;
+  }
+
+  if($columns){
+    $attribute['columns'] = $columns;
+  }
+
+  if($ids){
+    $attribute['ids'] = $ids;
+  }
+
+  $attribute = json_encode($attribute); 
   $tWpImage = "";
   foreach ($images as $key => $value) {
     $image = get_post($value);
@@ -131,7 +157,7 @@ function getWpGallery($images)
 <!-- /wp:image -->';
   }
 
-    $html = '<!-- wp:gallery {"linkTo":"none"} -->
+  $html = '<!-- wp:gallery '.$attribute.' -->
 <figure class="wp-block-gallery has-nested-images columns-default is-cropped">'.$tWpImage.'
 </figure>
 <!-- /wp:gallery -->';
@@ -141,7 +167,7 @@ function getWpGallery($images)
 function mypluginMediaUpload($request)
 {
   $postId = $request->get_param('post_id');
-  $time = $postId;
+  $folderName = $request->get_param('folder_name') ?? $postId;
   $attachment_ids = array();
   $files = $_FILES['files'];
 
@@ -155,8 +181,7 @@ function mypluginMediaUpload($request)
         'size' => $files['size'][$key]
       );
 
-      $uploaded_file = wp_handle_upload($file, array('test_form' => false), $time);
-      // var_dump($uploaded_file);
+      $uploaded_file = wp_handle_upload($file, array('test_form' => false), $folderName);
       if (isset($uploaded_file['error'])) {
         return new WP_Error('upload_error', $uploaded_file['error']);
       }
