@@ -9,6 +9,8 @@ import Row from 'primevue/row';                     //optional for row
 import FileUpload from 'primevue/fileupload';
 import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice';
+import Dropdown from 'primevue/dropdown';
+
 
 export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.use(PrimeVue, {ripple: true});
@@ -19,5 +21,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.component('Column', Column);
     nuxtApp.vueApp.component('FileUpload', FileUpload);
     nuxtApp.vueApp.component('Toast', Toast);
+    nuxtApp.vueApp.component('Dropdown', Dropdown);
     //other components that you need
 });

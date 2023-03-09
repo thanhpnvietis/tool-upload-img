@@ -7,7 +7,7 @@
       <Column field="id" header="ID"></Column>
       <Column field="title.rendered" header="Tiêu đề"></Column>
       <Column header="Trạng thái ">
-         <template #body="data">
+        <template #body="data">
             <span :class="status_process_label[data.data.status_process].class">
               {{status_process_label[data.data.status_process].label}}
             </span>
@@ -16,7 +16,7 @@
       <Column header="Chức năng">
         <template #body="data">
             <div class="btn-action">
-              <Button class="p-button-sm" label="Chèn ảnh" @click="addFile(data)" ></Button>
+              <Button class="p-button-sm" label="Chèn ảnh" @click="showModal(data)" ></Button>
               <Button class="p-button-sm" label="Xem list ảnh" @click="showModalImage(data)" ></Button>
               <Button class="p-button-sm" label="Xem bài viết" @click="linkWp(data)" ></Button>
               
@@ -31,9 +31,9 @@
       </div>
     </div>
      <input type="file" id="input-file" @change="onFileSelected($event)" hidden multiple="multiple">
-    <DialogUpload :display="display" :detail="detail" @updatePost="updatePost" />
+    <DialogUpload :display="display" :detail="detail" @loading="isLoading" @updatePost="fileUploaded" />
     <DialogShowImg :display="displayListImage" :detail="detail" />
-    <Toast />
+ 
   </div>
   <div :class="`${uploading ? 'show' : ''} loader`" >
     <div class="loading">
@@ -44,6 +44,7 @@
       <span></span>
     </div>
   </div>
+  <Toast />
 </template>
 <script>
 
@@ -112,12 +113,18 @@ export default {
       // this.postComplete = result.map(e => e.post_id);
     },
     updatePost(data,dataTool){
-      let index = this.posts.findIndex(e=>{
+      let index = this.posts.findIndex(e => {
         return e.id === data.id;
       });
       this.posts[index]['status_process'] = dataTool.status;
       this.posts[index]['image_url'] = dataTool.image_url;
       this.posts[index]['attachment_id'] = dataTool.image_id;
+    },
+    fileUploaded(data){
+      this.updatePost(this.detail,data.postComplete);
+    },
+    isLoading(data){
+      this.uploading = data.loading
     },
     linkWp(data){
       window.open(
@@ -135,8 +142,8 @@ export default {
      
       let attachmentId = this.detail.attachment_id || {};
       attachmentId = [...attachmentId];
-      formData.append('post_id', this.detail.id);
       formData.append('delete_attachment_id', attachmentId);
+      formData.append('post_id', this.detail.id);
       for( let i = 0; i < event.target.files.length; i ++ ){
           formData.append('files['+i+']', event.target.files[i] );
       }

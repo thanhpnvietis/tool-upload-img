@@ -15,7 +15,6 @@
   </Dialog>
   </template>
   <script>
-  import { useToast } from "primevue/usetoast";
   export default {
     props: {
       display: {
