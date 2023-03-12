@@ -51,7 +51,10 @@
               </div>
             </div>
             <div class="d-flex justify-content-center">
-              <Button :disabled="loadListImage"  label="Load more" @click="loadMoreImage()" ></Button>
+              <span v-if="notFoundImage">
+                Không tìm thấy ảnh
+              </span>
+              <Button v-else :disabled="loadListImage"  label="Load more" @click="loadMoreImage()" ></Button>
             </div>
           </TabPanel>
    
@@ -165,7 +168,10 @@ export default {
       return store.getListImage;
     },
     loadListImage() {
-      return store.loadListImage;
+      return store.getLoadListImage;
+    },
+    notFoundImage() {
+      return store.getNotFoundImage;
     },
   },
 
@@ -218,6 +224,7 @@ export default {
       size: "",
       columns: "",
       folder_name: "",
+      not_image:false
     };
   },
   created() {
@@ -299,6 +306,7 @@ export default {
           this.close();
         })
         .catch(async (e) => {
+
           this.error = e.message;
           this.uploading = false;
           let postComplete = await this.addPostComplete({

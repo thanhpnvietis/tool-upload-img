@@ -8,24 +8,27 @@ export const postStore = defineStore('posts', {
   state: () => ({ 
     listImage: [],
     loadListImage: false,
+    notFoundImage: false,
   }),
   getters: {
     getListImage: (state) => state.listImage,
     getLoadListImage: (state) => state.loadListImage,
+    getNotFoundImage: (state) => state.notFoundImage,
   },
   actions: {
     async acListImage(params) {
       this.loadListImage = true;
+      this.notFoundImage = false;
       $fetch(useRuntimeConfig().public.base_url_wp+'/wp-json/wp/v2/media?page='+params.page+'&per_page=35').then(async (data) =>{
         if(params.page == 1){
           this.listImage = data;
         }else{
           this.listImage = [...this.listImage,...data];
         }
-        console.log(this.listImage);
         this.loadListImage = false;
       }).catch(e=>{
         this.loadListImage = false;
+        this.notFoundImage = true;
       })
     }
   },
