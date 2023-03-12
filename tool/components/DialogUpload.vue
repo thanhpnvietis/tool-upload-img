@@ -296,6 +296,7 @@ export default {
             life: 3000,
           });
           this.$emit("updatePost", { postComplete });
+          this.close();
         })
         .catch(async (e) => {
           this.error = e.message;
@@ -314,6 +315,7 @@ export default {
             life: 3000,
           });
           this.$emit("updatePost", { postComplete });
+          
         });
     },
     selectImg(id){

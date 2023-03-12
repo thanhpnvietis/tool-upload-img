@@ -16,8 +16,7 @@ export const postStore = defineStore('posts', {
   actions: {
     async acListImage(params) {
       this.loadListImage = true;
-      $fetch(useRuntimeConfig().public.base_url_wp+'/wp-json/wp/v2/media?page='+params.page).then(async (data) =>{
-        console.log(data);
+      $fetch(useRuntimeConfig().public.base_url_wp+'/wp-json/wp/v2/media?page='+params.page+'&per_page=35').then(async (data) =>{
         if(params.page == 1){
           this.listImage = data;
         }else{
