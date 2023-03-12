@@ -14,10 +14,15 @@
     "nuxt": "^3.2.2"
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.4.7",
     "bootstrap": "^5.2.3",
     "firebase": "^9.17.1",
     "firebase-functions": "^4.2.1",
+    "pinia": "^2.0.33",
     "primeicons": "^6.0.1",
     "primevue": "^3.23.0"
+  },
+  "overrides": {
+    "vue": "latest"
   }
 }

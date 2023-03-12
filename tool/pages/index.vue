@@ -170,7 +170,6 @@ export default {
         }
 
       }).catch( async e => {
-        console.log(e);
         let postComplete =  await this.addPostComplete({
           post_id:this.detail.id,
           status: this.status_process.error,
@@ -228,7 +227,6 @@ export default {
         this.posts = [...this.posts ,...data];
         this.page++;
       }).catch(e=>{
-        console.log(e);
         this.notData = true;
       })
     }

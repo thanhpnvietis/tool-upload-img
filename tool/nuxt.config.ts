@@ -16,6 +16,9 @@ export default defineNuxtConfig({
       base_url_wp: process.env.BASE_URL_WP
     }
   },
+  modules: [
+    '@pinia/nuxt',
+  ],
   // nitro:{
   //   preset: 'firebase'
   // }
