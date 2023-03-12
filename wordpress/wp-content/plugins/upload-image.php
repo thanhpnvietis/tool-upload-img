@@ -6,7 +6,7 @@
 
 /*
 /*
-Plugin Name: api_upload_file
+Plugin Name: Tool upload image
 Plugin URI: http://wordpress.org/plugins/api_upload_file/
 Description: 
 Author: thanhpn
@@ -87,7 +87,7 @@ function pushImageToContent($postId, $listImage, $request)
   $content = $post->post_content;
 
   //check number H tag
-  preg_match_all('/<!-- wp:heading.*?-->[\s\S]*?<!-- \/wp:heading -->/', $content, $matchHeading);
+  preg_match_all('/\<h\d[^\>]*>.*?<\/h\d>/', $content, $matchHeading);
   $countHeading = count($matchHeading[0]);
 
   if(!$countHeading){
@@ -123,13 +123,19 @@ function pushImageToContent($postId, $listImage, $request)
 
   //remove wp:gallery old before H tag
   $content = preg_replace(
-    '/(:?<!-- wp:gallery.*-->[\s\S]*?<!-- \/wp:gallery -->[\n ]*?)(<!-- wp:heading.*?-->[\s\S]*?<!-- \/wp:heading -->[\n ]*?)/',
+    '/(:?\[gallery[^\]]*][\n ]*?)(\<h\d[^\>]*>.*?<\/h\d>[\n ]*?)/',
     '$2',
     $content
   );
+  // $content = preg_replace(
+  //   '/(:?<!-- wp:gallery.*-->[\s\S]*?<!-- \/wp:gallery -->[\n ]*?)(<!-- wp:heading.*?-->[\s\S]*?<!-- \/wp:heading -->[\n ]*?)/',
+  //   '$2',
+  //   $content
+  // );
 
   // add old wp:gallery before H tag
-  $content = preg_replace_callback('/<!-- wp:heading.*?-->[\s\S]*?<!-- \/wp:heading -->/',function($matchs) use ($gallerys , &$index){
+  // $content = preg_replace_callback('/<!-- wp:heading.*?-->[\s\S]*?<!-- \/wp:heading -->/',function($matchs) use ($gallerys , &$index){
+  $content = preg_replace_callback('/\<h\d[^\>]*>.*?<\/h\d>/',function($matchs) use ($gallerys , &$index){
     $gallery = $gallerys[$index];
     $index++;
     return $gallery.$matchs[0];
@@ -149,21 +155,23 @@ function pushImageToContent($postId, $listImage, $request)
 }
 function getWpGallery($images,$attribute)
 {
-  $attributeStr = json_encode($attribute); 
-  $tWpImage = "";
-  foreach ($images as $key => $value) {
-    $pathImage = wp_get_attachment_image_src($value,$attribute['sizeSlug']);
-    $tWpImage .= "\n";
-    $tWpImage .= '<!-- wp:image {"id":'.$value.',"sizeSlug":"'.$attribute['sizeSlug'].'","linkDestination":"'. $attribute['linkTo'].'"} -->
-<figure class="wp-block-image size-'.$attribute['sizeSlug'].'"><img src="'.$pathImage[0].'" alt="" class="wp-image-'.$value.'"/></figure>
-<!-- /wp:image -->';
-  }
+  // $attributeStr = json_encode($attribute); 
+  // $tWpImage = "";
+//   foreach ($images as $key => $value) {
+//     $pathImage = wp_get_attachment_image_src($value,$attribute['sizeSlug']);
+//     $tWpImage .= "\n";
+//     $tWpImage .= '<!-- wp:image {"id":'.$value.',"sizeSlug":"'.$attribute['sizeSlug'].'","linkDestination":"'. $attribute['linkTo'].'"} -->
+// <figure class="wp-block-image size-'.$attribute['sizeSlug'].'"><img src="'.$pathImage[0].'" alt="" class="wp-image-'.$value.'"/></figure>
+// <!-- /wp:image -->';
+//   }
 
-  $html = '<!-- wp:gallery '.$attributeStr.' -->
-<figure class="wp-block-gallery has-nested-images columns-'.$attribute['column'].' is-cropped">'.$tWpImage.'
-</figure>
-<!-- /wp:gallery -->';
-  return "\n".$html;
+//   $html = '<!-- wp:gallery '.$attributeStr.' -->
+// <figure class="wp-block-gallery has-nested-images columns-'.$attribute['column'].' is-cropped">'.$tWpImage.'
+// </figure>
+// <!-- /wp:gallery -->';
+  $ids = implode(',',$images);
+  $html = '[gallery columns="'. $attribute['columns'].'" link="'. $attribute['linkTo'].'" size="'.$attribute['sizeSlug'].'" ids="'.$ids.'"]';
+  return $html."\n";
 }
 function mypluginMediaUpload($request)
 {
